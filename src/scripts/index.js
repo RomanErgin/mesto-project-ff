@@ -1,6 +1,7 @@
 import '../pages/index.css';
-import { initialCards, createCard, handleLikeClick } from './cards.js';
-import {openModal,closeModal} from './modal.js';
+import { initialCards} from './cards.js';
+import {createCard, handleLikeClick } from './card.js';
+import {openModal, closeModal, handleEscape} from './modal.js';
 
 
 // Импортируем все изображения
@@ -12,7 +13,6 @@ import '../images/edit-icon.svg';
 import '../images/like-active.svg';
 import '../images/like-inactive.svg';
 import '../images/close.svg';
-// import { from } from 'core-js/core/array';
 
 // Находим форму и ее инпуты
 const addForm = document.querySelector('form[name="new-place"]');
@@ -41,7 +41,7 @@ const modals = [
 ];
 
 // Находим форму в DOM
-const formElement = document.querySelector('form[name="edit-profile"]');
+const editFormElement = document.querySelector('form[name="edit-profile"]');
 // Находим поля формы в DOM
 const nameInput = document.querySelector('.popup__input_type_name') ;
 const jobInput = document.querySelector('.popup__input_type_description');
@@ -49,15 +49,19 @@ const jobInput = document.querySelector('.popup__input_type_description');
 const profileName = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
 
+const imagePopup = document.querySelector('.popup_type_image');
+const popupImage = imagePopup.querySelector('.popup__image');
+const imagePopupCaption = imagePopup.querySelector('.popup__caption');
+
 // Функция обработки клика по изображению
 function handleImageClick(evt) {
-    const imagePopup = document.querySelector('.popup_type_image');
-    const popupImage = imagePopup.querySelector('.popup__image');
-    const popupCaption = imagePopup.querySelector('.popup__caption');
+    // const imagePopup = document.querySelector('.popup_type_image');
+    // const popupImage = imagePopup.querySelector('.popup__image');
+    // const popupCaption = imagePopup.querySelector('.popup__caption');
     
     popupImage.src = evt.target.src;
     popupImage.alt = evt.target.alt;
-    popupCaption.textContent = evt.target.alt;
+    imagePopupCaption.textContent = evt.target.alt;
     
     openModal(imagePopup);
 }
@@ -80,7 +84,8 @@ addButton.addEventListener('click', () => {
     openModal(addPopup);
 });
 
-modals.forEach((modal) => {
+// Обработчик закрытия попапов
+modals.forEach(modal => {
     modal.addEventListener('click', (event) => {
         if(event.target.classList.contains('popup__close') || event.target.classList.contains('popup')) {
             closeModal(modal);
@@ -88,18 +93,10 @@ modals.forEach((modal) => {
     });
 });
 
-document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-        modals.forEach((modal) => {
-            closeModal(modal);
-        });
-    }
-});
+document.addEventListener('keydown', handleEscape);
 
-function handleFormSubmit(evt) {
+function handleEditFormSubmit(evt) {
     evt.preventDefault();
-    profileName.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
     profileName.textContent = nameInput.value;
     profileDescription.textContent = jobInput.value;
     closeModal(editPopup);
@@ -107,7 +104,7 @@ function handleFormSubmit(evt) {
 
 // Прикрепляем обработчик к форме:
 // он будет следить за событием "submit" - «отправка»
-formElement.addEventListener('submit', handleFormSubmit);
+editFormElement.addEventListener('submit', handleEditFormSubmit);
 
 function handleAddFormSubmit(evt) {
     evt.preventDefault();
