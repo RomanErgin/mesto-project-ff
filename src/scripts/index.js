@@ -93,8 +93,6 @@ modals.forEach(modal => {
     });
 });
 
-document.addEventListener('keydown', handleEscape);
-
 function handleEditFormSubmit(evt) {
     evt.preventDefault();
     profileName.textContent = nameInput.value;
