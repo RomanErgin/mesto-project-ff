@@ -1,7 +1,9 @@
+// import './api.js'; // Удалено, чтобы не было двойного подключения
 import '../pages/index.css';
-import { initialCards} from './cards.js';
+import {getUser, getCards, updateAvatar, addCard} from './api.js';
 import {createCard, handleLikeClick } from './card.js';
 import {openModal, closeModal, handleEscape} from './modal.js';
+import {enableValidation, clearValidation} from './validation.js';
 
 
 // Импортируем все изображения
@@ -13,6 +15,7 @@ import '../images/edit-icon.svg';
 import '../images/like-active.svg';
 import '../images/like-inactive.svg';
 import '../images/close.svg';
+import '../images/vector.png';
 
 // Находим форму и ее инпуты
 const addForm = document.querySelector('form[name="new-place"]');
@@ -48,10 +51,16 @@ const jobInput = document.querySelector('.popup__input_type_description');
 
 const profileName = document.querySelector('.profile__title');
 const profileDescription = document.querySelector('.profile__description');
+const profileImage = document.querySelector('.profile__image');
 
 const imagePopup = document.querySelector('.popup_type_image');
 const popupImage = imagePopup.querySelector('.popup__image');
 const imagePopupCaption = imagePopup.querySelector('.popup__caption');
+
+const avatarEditIcon = document.querySelector('.profile__avatar-edit');
+const avatarPopup = document.querySelector('.popup_type_avatar');
+const avatarForm = document.querySelector('form[name="edit-avatar"]');
+const avatarInput = document.querySelector('.popup__input_type_avatar-url');
 
 // Функция обработки клика по изображению
 function handleImageClick(evt) {
@@ -66,21 +75,50 @@ function handleImageClick(evt) {
     openModal(imagePopup);
 }
 
-// @todo: Вывести карточки на страницу
-initialCards.forEach((card) => {
-    const cardElement = createCard(card, handleLikeClick, handleImageClick, cardTemplate);
-    placesList.append(cardElement);
-});
+// @todo: Вывести карточки на страницу только после загрузки пользователя
+let currentUserId;
 
-// Добавляем обработчик клика по кнопке редактирования
+Promise.all([getUser(), getCards()])
+  .then(([user, cards]) => {
+    // Подставляем данные пользователя
+    profileName.textContent = user.name;
+    profileDescription.textContent = user.about;
+    profileImage.style.backgroundImage = `url('${user.avatar}')`;
+    currentUserId = user._id;
+    // Рендерим карточки
+    cards.forEach(card => {
+      const cardElement = createCard(card, handleLikeClick, handleImageClick, cardTemplate, currentUserId);
+      placesList.append(cardElement);
+    });
+  })
+  .catch(err => {
+    console.error('Ошибка загрузки данных:', err);
+  });
+
+// Конфиг для валидации
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+};
+
+enableValidation(validationConfig);
+
+// Открытие попапа профиля с очисткой ошибок
 editButton.addEventListener('click', () => {
     nameInput.value = profileName.textContent;
     jobInput.value = profileDescription.textContent;
+    clearValidation(editFormElement, validationConfig);
     openModal(editPopup);
 });
 
-// Добавляем обработчик клика по кнопке добавления карточки
+// Открытие попапа добавления карточки с очисткой ошибок
 addButton.addEventListener('click', () => {
+    addForm.reset();
+    clearValidation(addForm, validationConfig);
     openModal(addPopup);
 });
 
@@ -93,28 +131,70 @@ modals.forEach(modal => {
     });
 });
 
+// Получаем кнопку сохранения профиля
+const saveProfileButton = editFormElement.querySelector('.popup__button');
+const addCardButton = addForm.querySelector('.popup__button');
+const saveAvatarButton = avatarForm.querySelector('.popup__button');
+
 function handleEditFormSubmit(evt) {
     evt.preventDefault();
-    profileName.textContent = nameInput.value;
-    profileDescription.textContent = jobInput.value;
-    closeModal(editPopup);
+    const originalText = saveProfileButton.textContent;
+    saveProfileButton.textContent = 'Сохранение...';
+    // Здесь должен быть PATCH-запрос на сервер для профиля, например updateProfile(...)
+    // Пока просто имитируем задержку через Promise.resolve
+    Promise.resolve().then(() => {
+      profileName.textContent = nameInput.value;
+      profileDescription.textContent = jobInput.value;
+      closeModal(editPopup);
+    }).finally(() => {
+      saveProfileButton.textContent = originalText;
+    });
 }
 
-// Прикрепляем обработчик к форме:
-// он будет следить за событием "submit" - «отправка»
 editFormElement.addEventListener('submit', handleEditFormSubmit);
 
 function handleAddFormSubmit(evt) {
     evt.preventDefault();
-    const newCard = {
-        name: placeInput.value,
-        link: linkInput.value,
-        alt: placeInput.value
-    };
-    const cardElement = createCard(newCard, handleLikeClick, handleImageClick, cardTemplate);
-    placesList.prepend(cardElement);
-    addForm.reset();
-    closeModal(addPopup);
+    const originalText = addCardButton.textContent;
+    addCardButton.textContent = 'Сохранение...';
+    addCard(placeInput.value, linkInput.value)
+      .then(card => {
+        const cardElement = createCard(card, handleLikeClick, handleImageClick, cardTemplate, currentUserId);
+        placesList.prepend(cardElement);
+        addForm.reset();
+        clearValidation(addForm, validationConfig);
+        closeModal(addPopup);
+      })
+      .catch(err => {
+        console.error('Ошибка добавления карточки:', err);
+      })
+      .finally(() => {
+        addCardButton.textContent = originalText;
+      });
 }
 
 addForm.addEventListener('submit', handleAddFormSubmit);
+
+profileImage.addEventListener('click', () => {
+  avatarForm.reset();
+  clearValidation(avatarForm, validationConfig);
+  openModal(avatarPopup);
+});
+
+avatarForm.addEventListener('submit', function(evt) {
+  evt.preventDefault();
+  const originalText = saveAvatarButton.textContent;
+  saveAvatarButton.textContent = 'Сохранение...';
+  const newAvatarUrl = avatarInput.value;
+  updateAvatar(newAvatarUrl)
+    .then(user => {
+      profileImage.style.backgroundImage = `url('${user.avatar}')`;
+      closeModal(avatarPopup);
+    })
+    .catch(err => {
+      console.error('Ошибка смены аватара:', err);
+    })
+    .finally(() => {
+      saveAvatarButton.textContent = originalText;
+    });
+});

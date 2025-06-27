@@ -7,6 +7,7 @@
   background-size: cover;
   background-position: center;
   margin: 0 29px 0 0;
+  position: relative;
 }
 
 @media screen and (max-width: 740px) {
@@ -19,4 +20,35 @@
   .profile__image {
     margin-right: 0;
   }
+}
+
+.profile__avatar-edit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 26px;
+  height: 26px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+}
+
+.profile__image:hover .profile__avatar-edit {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.profile__image:hover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.5) url('../../../images/vector.png') center/40px 40px no-repeat;
+  border-radius: 50%;
+  z-index: 2;
+  pointer-events: none;
+  transition: background 0.3s;
 }
