@@ -26,6 +26,12 @@ function validateTextInput(input) {
 }
  
 function handleInputValidation(input, config) { 
+  // Проверка на пустое поле
+  if (input.value.trim() === '') {
+    showInputError(input.closest('form'), input, 'Вы пропустили это поле.', config);
+    return false;
+  }
+  
   // Дополнительная проверка для текстовых полей (кроме URL)
   if (input.type === 'text' && input.name !== 'link' && input.name !== 'avatar') {
     const textError = validateTextInput(input);
