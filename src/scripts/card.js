@@ -18,12 +18,8 @@ function createCard(card, likeHandler, imageHandler, cardTemplate, currentUserId
     if (card.owner._id === currentUserId) {
         deleteBtn.addEventListener('click', () => {
             deleteCardFromServer(card._id)
-                .then(res => {
-                    if (res.ok) {
-                        cardContent.remove();
-                    } else {
-                        return res.json().then(data => Promise.reject(data));
-                    }
+                .then(() => {
+                    cardContent.remove();
                 })
                 .catch(err => {
                     console.error('Ошибка удаления карточки:', err);

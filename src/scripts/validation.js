@@ -13,17 +13,6 @@ function hideInputError(formElement, inputElement, config) {
   errorElement.textContent = ''; 
   errorElement.classList.remove(config.errorClass); 
 } 
-
-// Функция для проверки текстовых полей на наличие только букв, дефисов и пробелов
-function validateTextInput(input) {
-  const value = input.value;
-  const textPattern = /^[A-Za-zА-Яа-яЁё\s\-]*$/;
-  
-  if (value && !textPattern.test(value)) {
-    return 'Разрешены только буквы, дефисы и пробелы.';
-  }
-  return '';
-}
  
 function handleInputValidation(input, config) { 
   // Проверка на пустое поле
@@ -32,21 +21,17 @@ function handleInputValidation(input, config) {
     return false;
   }
   
-  // Дополнительная проверка для текстовых полей (кроме URL)
-  if (input.type === 'text' && input.name !== 'link' && input.name !== 'avatar') {
-    const textError = validateTextInput(input);
-    if (textError) {
-      showInputError(input.closest('form'), input, textError, config);
-      return false;
-    }
-  }
-  
   if (input.validity.valid) { 
     hideInputError(input.closest('form'), input, config); 
     return true; 
   } else { 
-    // Используем кастомное сообщение из title, если оно есть, иначе стандартное
-    const errorMessage = input.title || input.validationMessage;
+    // Используем кастомное сообщение из data-error-message для ошибок паттерна, иначе из title, иначе стандартное сообщение браузера
+    let errorMessage;
+    if (input.validity.patternMismatch && input.dataset.errorMessage) {
+      errorMessage = input.dataset.errorMessage;
+    } else {
+      errorMessage = input.title || input.validationMessage;
+    }
     showInputError(input.closest('form'), input, errorMessage, config); 
     return false; 
   } 
@@ -82,9 +67,6 @@ function enableValidation(config) {
   const formList = Array.from(document.querySelectorAll(config.formSelector)); 
   formList.forEach((formElement) => { 
     setEventListeners(formElement, config); 
-    const inputList = Array.from(formElement.querySelectorAll(config.inputSelector)); 
-    const buttonElement = formElement.querySelector(config.submitButtonSelector); 
-    toggleButtonState(inputList, buttonElement, config); 
   }); 
 }
  

@@ -39,9 +39,9 @@
       <button type="button" class="popup__close"></button> 
       <h3 class="popup__title">Редактировать профиль</h3> 
       <form class="popup__form" name="edit-profile"> 
-        <input type="text" name="name" class="popup__input popup__input_type_name" placeholder="Имя" minlength="2" maxlength="40" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$" required title="Минимальное количество символов: 2. Длина теекста сейчас: 1 символ.">
+        <input type="text" name="name" class="popup__input popup__input_type_name" placeholder="Имя" minlength="2" maxlength="40" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$" data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы" required title="Минимальное количество символов: 2. Длина текста сейчас: 1 символ.">
         <span class="popup__error" id="name-error"></span> 
-        <input type="text" name="description" class="popup__input popup__input_type_description" placeholder="Занятие" minlength="2" maxlength="200" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$" required title="Минимальное количество символов: 2. Длина теекста сейчас: 1 символ."> 
+        <input type="text" name="description" class="popup__input popup__input_type_description" placeholder="Занятие" minlength="2" maxlength="200" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$" data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы" required title="Минимальное количество символов: 2. Длина текста сейчас: 1 символ."> 
         <span class="popup__error" id="description-error"></span> 
         <button type="submit" class="button popup__button">Сохранить</button> 
       </form> 
@@ -52,7 +52,7 @@
       <button type="button" class="popup__close"></button> 
       <h3 class="popup__title">Новое место</h3> 
       <form class="popup__form" name="new-place"> 
-        <input type="text" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" minlength="2" maxlength="30" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$" required title="Минимальное количество символов: 2. Длина теекста сейчас: 1 символ."> 
+        <input type="text" name="place-name" class="popup__input popup__input_type_card-name" placeholder="Название" minlength="2" maxlength="30" pattern="^[A-Za-zА-Яа-яЁё\s\-]+$" data-error-message="Разрешены только латинские, кириллические буквы, знаки дефиса и пробелы" required title="Минимальное количество символов: 2. Длина текста сейчас: 1 символ.">
         <span class="popup__error" id="place-name-error"></span> 
         <input type="url" name="link" class="popup__input popup__input_type_url" placeholder="Ссылка на картинку" required title="Введите адрес сайта."> 
         <span class="popup__error" id="link-error"></span> 
@@ -72,7 +72,7 @@
       <button type="button" class="popup__close"></button> 
       <h3 class="popup__title">Обновить аватар</h3> 
       <form class="popup__form" name="edit-avatar"> 
-        <input type="url" name="avatar" class="popup__input popup__input_type_avatar-url" placeholder="Ссылка на аватар" required title="Введите корректную ссылку на изображение аватара."> 
+        <input type="url" name="avatar" class="popup__input popup__input_type_avatar-url" placeholder="Ссылка на аватар" required>
         <span class="popup__error" id="avatar-error"></span> 
         <button type="submit" class="button popup__button">Сохранить</button> 
       </form> 

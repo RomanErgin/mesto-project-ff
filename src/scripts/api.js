@@ -6,7 +6,7 @@ const token = 'b78062c5-5b7d-495f-bdff-93ab343408f0';
 // Универсальный метод для обработки ответов от сервера
 function getResponseData(res) {
   if (!res.ok) {
-    console.log(`Ошибка: ${res.status}`);
+    return Promise.reject(`Ошибка: ${res.status}`);
   }
   // Проверяем, есть ли тело ответа перед вызовом json()
   return res.text().then(text => {
